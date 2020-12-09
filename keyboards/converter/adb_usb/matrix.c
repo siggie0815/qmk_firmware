@@ -17,19 +17,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 Ported to QMK by Peter Roe <pete@13bit.me>
 */
 
-#include <stdint.h>
 #include <stdbool.h>
-#include <avr/io.h>
-#include <util/delay.h>
-#include "print.h"
-#include "util.h"
-#include "debug.h"
+#include <stdint.h>
 #include "adb.h"
-#include "matrix.h"
-#include "report.h"
+#include "config.h"
+#include "debug.h"
 #include "host.h"
 #include "led.h"
+#include "matrix.h"
+#include "print.h"
+#include "report.h"
 #include "timer.h"
+#include "wait.h"
 
 static bool is_iso_layout = false;
 
@@ -76,7 +75,7 @@ void matrix_init(void)
     // Tested with devices:
     // M0115J(AEK), M3501(AEKII), M0116(Standard), M1242(Adjustable),
     // G5431(Mouse), 64210(Kensington Trubo Mouse 5)
-    _delay_ms(1000);
+    wait_ms(1000);
 
     device_scan();
 
