@@ -108,6 +108,18 @@ void matrix_init(void)
     }
     xprintf("handler: %02X, ISO: %s\n", handler_id, (is_iso_layout ? "yes" : "no"));
 
+    // Enable keyboard left/right modifier distinction on AEKs
+    // Listen Register3
+    //  upper byte: reserved bits 0000, keyboard address 0010
+    //  lower byte: device handler 00000011
+    // Note: This will change the keyborads handler ID which may cause trouble with recognition of swapping codes on ISO boards.
+    //       Problems will occur when converter MCU is resetted without powercycling the keyboard itsself.
+    if (handler_id == ADB_HANDLER_AEK || handler_id == ADB_HANDLER_AEK_ISO)
+    {
+        adb_host_listen(ADB_ADDR_KEYBOARD, ADB_REG_3, ADB_ADDR_KEYBOARD, ADB_HANDLER_AEK_RMOD);
+        device_scan();
+    }
+
     // initialize matrix state: all keys off
     for (uint8_t i=0; i < MATRIX_ROWS; i++) matrix[i] = 0x00;
 
