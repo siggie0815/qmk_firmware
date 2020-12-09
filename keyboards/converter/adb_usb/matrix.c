@@ -56,12 +56,57 @@ __attribute__ ((weak))
 void matrix_scan_user(void) {
 }
 
+static void device_scan(void) {
+    xprintf("\nScan:\n");
+    for (uint8_t addr = 0; addr < 16; addr++) {
+        uint16_t reg3 = adb_host_talk(addr, ADB_REG_3);
+        if (reg3) {
+            xprintf(" addr:%d, reg3:%04X\n", addr, reg3);
+        }
+    }
+}
+
 void matrix_init(void)
 {
     adb_host_init();
 
-    // wait for keyboard to boot up and receive command
-    _delay_ms(2000);
+    // AEK/AEKII(ANSI/ISO) startup is slower. Without proper delay
+    // it would fail to recognize layout and enable Extended protocol.
+    // 200ms seems to be enough for AEKs. 1000ms is used for safety.
+    // Tested with devices:
+    // M0115J(AEK), M3501(AEKII), M0116(Standard), M1242(Adjustable),
+    // G5431(Mouse), 64210(Kensington Trubo Mouse 5)
+    _delay_ms(1000);
+
+    device_scan();
+
+    //
+    // Keyboard
+    //
+    xprintf("\nKeyboard:\n");
+    // Determine ISO keyboard by handler id, most ids here are unknown and taken on from:
+    // https://github.com/torvalds/linux/blob/v5.9/drivers/macintosh/adbhid.c#L802
+    uint8_t handler_id = (uint8_t) adb_host_talk(ADB_ADDR_KEYBOARD, ADB_REG_3);
+    switch (handler_id) {
+        case ADB_HANDLER_STD_ISO:
+        case ADB_HANDLER_AEK_ISO:
+        case 0x07:
+        case 0x09:
+        case 0x0D:
+        case 0x11:
+        case 0x14:
+        case 0x19:
+        case 0x1D:
+        case 0xC1:
+        case 0xC4:
+        case 0xC7:
+            is_iso_layout = true;
+            break;
+        default:
+            is_iso_layout = false;
+            break;
+    }
+    xprintf("handler: %02X, ISO: %s\n", handler_id, (is_iso_layout ? "yes" : "no"));
 
     // initialize matrix state: all keys off
     for (uint8_t i=0; i < MATRIX_ROWS; i++) matrix[i] = 0x00;
