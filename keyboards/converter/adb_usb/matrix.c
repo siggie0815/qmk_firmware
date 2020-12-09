@@ -123,12 +123,6 @@ void matrix_init(void)
     // initialize matrix state: all keys off
     for (uint8_t i=0; i < MATRIX_ROWS; i++) matrix[i] = 0x00;
 
-    // debug_enable = true;
-    // debug_matrix = true;
-    // debug_keyboard = true;
-    // debug_mouse = true;
-    // print("debug enabled.\n");
-
     matrix_init_quantum();
 }
 
@@ -315,4 +309,9 @@ static void register_key(uint8_t key)
     } else {
         matrix[row] |=  (1<<col);
     }
+}
+
+void led_set(uint8_t usb_led)
+{
+    adb_host_kbd_led(~usb_led);
 }

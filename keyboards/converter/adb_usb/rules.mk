@@ -26,4 +26,4 @@ BACKLIGHT_ENABLE = no
 #BLUETOOTH        = AdafruitBLE  # For Adafruit Feather 32U4 BLE support, uncomment this line
 CUSTOM_MATRIX    = yes
 
-SRC = matrix.c adb.c led.c
+SRC = matrix.c adb.c
