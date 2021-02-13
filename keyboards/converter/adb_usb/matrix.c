@@ -19,6 +19,7 @@ Ported to QMK by Peter Roe <pete@13bit.me>
 
 #include <stdbool.h>
 #include <stdint.h>
+#include "action_layer.h"
 #include "adb.h"
 #include "config.h"
 #include "debug.h"
@@ -106,6 +107,20 @@ void matrix_init(void)
             break;
     }
     xprintf("handler: %02X, ISO: %s\n", handler_id, (is_iso_layout ? "yes" : "no"));
+
+    switch (handler_id) {
+        case ADB_HANDLER_AEK:
+            layer_move(0);
+            break;
+        case ADB_HANDLER_AEK_ISO:
+            layer_move(2);
+            break;
+        case ADB_HANDLER_STD_ISO:
+            layer_move(4);
+            break;
+        default:
+            break;
+    }
 
     // Enable keyboard left/right modifier distinction on AEKs
     // Listen Register3
